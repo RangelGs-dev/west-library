@@ -1,0 +1,18 @@
+{% extends "base_generic.html" %} {% block content %}
+<h1>West Library Home</h1>
+<p>
+  Bem vindo a West Library, um site desenvolvido por
+  <em>RangelGs-dev</em>
+</p>
+
+<h2>Conteúdo dinâmico (Acervo)</h2>
+
+<p>A biblioteca possui a seguinte quantidade de registros:</p>
+<ul>
+  <li><strong>Books:</strong> {{number_books}}</li>
+  <li><strong>Copies:</strong> {{number_instances}}</li>
+  <li><strong>Copies avaiable:</strong> {{number_instances_available}}</li>
+  <li><strong>Authors:</strong> {{number_authors}}</li>
+</ul>
+
+{% endblock content %}
