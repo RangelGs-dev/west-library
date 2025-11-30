@@ -15,4 +15,6 @@
   <li><strong>Authors:</strong> {{number_authors}}</li>
 </ul>
 
+<p>Você visitou esta página {{ number_visits }} {% if number_visits == 1 %} vez.{% else %} vezes.{% endif %}</p>
+
 {% endblock content %}
