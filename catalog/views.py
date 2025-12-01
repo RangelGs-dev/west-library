@@ -1,6 +1,7 @@
-from django.shortcuts import render
 from catalog.models import Book, Author, BookInstance, Genre
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
+from django.shortcuts import render
 
 def index(request):
     number_books = Book.objects.all().count()
@@ -32,3 +33,12 @@ class BookListView(generic.ListView):
 
 class BookDetailView(generic.DetailView):
     model = Book
+
+
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed_user.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return (BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back'))
