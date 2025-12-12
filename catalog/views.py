@@ -1,7 +1,17 @@
-from catalog.models import Book, Author, BookInstance, Genre
-from django.contrib.auth.mixins import LoginRequiredMixin
+import datetime
+
 from django.views import generic
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render
+from django.urls import reverse
+
+from catalog.models import Book, Author, BookInstance, Genre
+
+from catalog.forms import RenewBookForm
 
 def index(request):
     number_books = Book.objects.all().count()
@@ -42,3 +52,41 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return (BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back'))
+
+
+class ListOfBooksOnLoanLibrarianVision(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    permission_required = 'catalog.can_mark_returned'
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_of_books_on_loan_librarian_vision.html'
+
+    def get_queryset(self):
+        return (BookInstance.objects.filter(status__exact='o').order_by('due_back'))
+
+
+@permission_required('catalog.can_mark_returned')
+def renew_book_librarian(request, pk):
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    # Se for uma solicitação POST, processa os dados do form
+    if request.method == 'POST':
+        #Instancia um formulario de RenewBookForm e faz o binding dos dados da req.
+        form = RenewBookForm(request.POST)
+
+        # Valida o form
+        if form.is_valid():
+            book_instance.due_back = form.cleaned_data['renewal_date']
+            book_instance.save()
+
+            return HttpResponseRedirect(reverse('renew-book-librarian', args=[book_instance.pk]))
+        
+        # Se qualquer outro método, cria-se um form padrão
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
+
+    context = {
+        'form': form,
+        'book_instance': book_instance,
+    }
+
+    return render(request, 'catalog/book_renew_librarian.html', context)
