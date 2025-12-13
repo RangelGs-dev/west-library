@@ -77,7 +77,7 @@ def renew_book_librarian(request, pk):
             book_instance.due_back = form.cleaned_data['renewal_date']
             book_instance.save()
 
-            return HttpResponseRedirect(reverse('renew-book-librarian', args=[book_instance.pk]))
+            return HttpResponseRedirect(reverse('all-borrowed'))
         
         # Se qualquer outro método, cria-se um form padrão
     else:
