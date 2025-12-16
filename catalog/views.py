@@ -37,6 +37,13 @@ def index(request):
 
     return render(request, 'index.html', context=context)
 
+class AuthorsListView(generic.ListView):
+    model = Author
+
+
+class AuthorDetailView(generic.DetailView):
+    model = Author
+
 
 class BookListView(generic.ListView):
     model = Book

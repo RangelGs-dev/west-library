@@ -1,0 +1,17 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Informações do autor</h1>
+
+  {% if author %}
+    <h2>{{ author.last_name }}, {{author.first_name}}</h2>
+    <p>
+      {{ author.date_of_birth }}
+      {% if author.date_of_death %}
+        – {{ author.date_of_death }}
+      {% endif %}
+    </p>
+  {% else %}
+    <p>Não há mais informações sobre o autor.</p>
+  {% endif %}
+{% endblock content %}
